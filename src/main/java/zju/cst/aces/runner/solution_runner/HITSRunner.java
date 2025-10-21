@@ -1,5 +1,8 @@
 package zju.cst.aces.runner.solution_runner;
 
+import com.mkonst.analysis.ClassContainer;
+import com.mkonst.analysis.JavaClassContainer;
+import com.mkonst.runners.YateJavaRunner;
 import zju.cst.aces.api.config.Config;
 import zju.cst.aces.api.impl.PromptConstructorImpl;
 import zju.cst.aces.api.impl.obfuscator.Obfuscator;
@@ -67,7 +70,26 @@ public class HITSRunner extends MethodRunner {
 
                         promptInfo.setRound(rounds);
 
-                        // Repair
+                        // Repair - TODO ADD YATE
+                        System.out.println("Running YATE to fix compilation isses");
+//                        System.out.println("Full class name: " + fullClassName);
+//                        System.out.println("Class info: " + classInfo);
+//                        System.out.println("Prompt Info:\n" + promptInfo);
+
+                        // Obtain class content
+                        String classCode = classInfo.compilationUnitCode;
+                        String testCode = promptInfo.getUnitTest();
+                        System.out.println("Test code:\n" + testCode);
+                        System.out.println("Class code:\n" + classCode);
+
+                        // TODO: Create a Class Container and a JavaRunner
+                        // TODO: Afterwards, use YATE to fix problematic tests
+                        // Create a YATE Class Container
+//                        ClassContainer cutContainer = new JavaClassContainer(classInfo.className, classInfo.compilationUnitCode);
+
+                        System.exit(0);
+
+//                        YateJavaRunner yateJavaRunner = new YateJavaRunner()
                         phase_hits.generateSliceTest(pc);
                         // Validation and process
                         if (phase_hits.validateTest(pc)) { // if passed validation

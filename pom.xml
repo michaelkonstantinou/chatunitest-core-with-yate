@@ -2,10 +2,10 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <!--gav information-->
-    <groupId>io.github.zju-aces-ise</groupId>
-    <artifactId>chatunitest-core</artifactId>
+    <groupId>com.mkonst</groupId>
+    <artifactId>chatunitest-core-with-yate</artifactId>
     <!--Uploading to the SNAPSHOT repository, the version suffix must include 'SNAPSHOT'-->
-    <version>2.1.1</version>
+    <version>1.0-SNAPSHOT</version>
     <packaging>jar</packaging>
     <name>chatunitest-core</name>
     <description>A framework to generate unit tests using LLMs</description>
@@ -28,10 +28,17 @@
     </developers>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <maven.compiler.source>8</maven.compiler.source>
-        <maven.compiler.target>8</maven.compiler.target>
+        <maven.compiler.source>17</maven.compiler.source>
+        <maven.compiler.target>17</maven.compiler.target>
     </properties>
     <dependencies>
+        <!-- Yate Core -->
+        <dependency>
+            <groupId>com.mkonst</groupId>
+            <artifactId>yate-java</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
+
         <dependency>
             <groupId>org.apache.maven</groupId>
             <artifactId>maven-plugin-api</artifactId>
@@ -246,7 +253,7 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-javadoc-plugin</artifactId>
-                        <version>3.0.0</version>
+                        <version>3.6.3</version>
                         <configuration>
                             <show>private</show>
                             <nohelp>true</nohelp>
@@ -267,34 +274,8 @@
                             </execution>
                         </executions>
                     </plugin>
-                    <!--gpg plugin-->
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-gpg-plugin</artifactId>
-                        <version>1.5</version>
-                        <executions>
-                            <execution>
-                                <id>sign-artifacts</id>
-                                <phase>verify</phase>
-                                <goals>
-                                    <goal>sign</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                    </plugin>
                 </plugins>
             </build>
-
-            <distributionManagement>
-                <snapshotRepository>
-                    <id>release</id>
-                    <url>https://s01.oss.sonatype.org/content/repositories/snapshots</url>
-                </snapshotRepository>
-                <repository>
-                    <id>release</id>
-                    <url>https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/</url>
-                </repository>
-            </distributionManagement>
         </profile>
     </profiles>
     <build>

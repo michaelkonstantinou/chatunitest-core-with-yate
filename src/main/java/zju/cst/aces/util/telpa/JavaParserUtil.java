@@ -13,7 +13,6 @@ import com.github.javaparser.ast.expr.Expression;
 import com.github.javaparser.resolution.UnsolvedSymbolException;
 import com.github.javaparser.resolution.types.ResolvedType;
 import lombok.Data;
-import lombok.var;
 import slicing.graphs.CallGraph;
 import slicing.graphs.jsysdg.JSysDG;
 import slicing.graphs.sdg.SDG;
@@ -25,8 +24,6 @@ import zju.cst.aces.dto.MethodExampleMap;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.OutputStream;
-import java.io.PrintStream;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;

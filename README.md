@@ -1,3 +1,11 @@
+# ChatUniTest + YATE's fixing components
+
+This is an attempt to integrate YATE's repairing components into ChatUniTest in order to achieve better results
+
+> Currently, this is a work in progress and SHOULD NOT BE USED
+
+For more information either got to ChatUniTest's default repository or yate-java repository
+
 # :mega: ChatUnitest Core
 
 [English](./README.md) | [中文](./Readme_zh.md)
