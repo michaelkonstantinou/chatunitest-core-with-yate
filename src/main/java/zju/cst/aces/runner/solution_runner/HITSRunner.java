@@ -2,7 +2,10 @@ package zju.cst.aces.runner.solution_runner;
 
 import com.mkonst.analysis.ClassContainer;
 import com.mkonst.analysis.JavaClassContainer;
+import com.mkonst.helpers.YateJavaUtils;
 import com.mkonst.runners.YateJavaRunner;
+import com.mkonst.types.ClassPathsContainer;
+import com.mkonst.types.YateResponse;
 import zju.cst.aces.api.config.Config;
 import zju.cst.aces.api.impl.PromptConstructorImpl;
 import zju.cst.aces.api.impl.obfuscator.Obfuscator;
@@ -14,6 +17,7 @@ import zju.cst.aces.runner.MethodRunner;
 import zju.cst.aces.util.JsonResponseProcessor;
 
 import java.io.IOException;
+import java.util.ArrayList;
 
 public class HITSRunner extends MethodRunner {
     public HITSRunner(Config config, String fullClassName, MethodInfo methodInfo) throws IOException {
@@ -65,40 +69,40 @@ public class HITSRunner extends MethodRunner {
                     hasErrors = true;
                 }
                 if (hasErrors) {
-                    // Validation and Repair Phase
-                    for (int rounds = 1; rounds < config.getMaxRounds(); rounds++) {
 
-                        promptInfo.setRound(rounds);
+                    // Repair using YATE
+                    System.out.println("Running YATE to fix compilation issues");
+                    String[] testClassSplit = promptInfo.fullTestName.split("\\.");
+                    String testClassName = testClassSplit[testClassSplit.length - 1];
 
-                        // Repair - TODO ADD YATE
-                        System.out.println("Running YATE to fix compilation isses");
-//                        System.out.println("Full class name: " + fullClassName);
-//                        System.out.println("Class info: " + classInfo);
-//                        System.out.println("Prompt Info:\n" + promptInfo);
+                    System.out.println("Trying to fix test: " + testClassName);
 
-                        // Obtain class content
-                        String classCode = classInfo.compilationUnitCode;
-                        String testCode = promptInfo.getUnitTest();
-                        System.out.println("Test code:\n" + testCode);
-                        System.out.println("Class code:\n" + classCode);
+                    String repositoryPath = config.getProject().getBasedir().getAbsolutePath();
 
-                        // TODO: Create a Class Container and a JavaRunner
-                        // TODO: Afterwards, use YATE to fix problematic tests
-                        // Create a YATE Class Container
-//                        ClassContainer cutContainer = new JavaClassContainer(classInfo.className, classInfo.compilationUnitCode);
+                    // Locate class under test path (used by YATE to generate and analyze related files)
+                    String cutPath = YateJavaUtils.INSTANCE.getClassFileFromPackage(repositoryPath, fullClassName);
 
-                        System.exit(0);
+                    // Create a YATE Class Container to hold the CUT info
+                    JavaClassContainer cutContainer = new JavaClassContainer(classInfo.className, classInfo.compilationUnitCode);
+                    cutContainer.getPaths().setCut(cutPath);
 
-//                        YateJavaRunner yateJavaRunner = new YateJavaRunner()
-                        phase_hits.generateSliceTest(pc);
-                        // Validation and process
-                        if (phase_hits.validateTest(pc)) { // if passed validation
-                            exportRecord(pc.getPromptInfo(), classInfo, num);
-                            hasErrors = false;
-                            break; // successfully
-                        }
+                    // Create a YATE Test class container to hold the info of the generated test class
+                    JavaClassContainer testContainer = new JavaClassContainer(testClassName, promptInfo.getUnitTest());
+                    testContainer.setPathsFromCut(cutContainer);
+                    testContainer.toTestFile();
 
-                    }
+                    // Create a YateResponse object, to allow YATE to append modifications between LLM-interactions
+                    YateResponse yateResponse = new YateResponse(testContainer, new ArrayList<>(), false);
+
+                    // Initialize a new runner to invoke YATE components
+                    YateJavaRunner runner = new YateJavaRunner(repositoryPath, false, null, null);
+
+                    // Invoke YATE's compilation fixing component
+                    runner.fixGeneratedTestClass(cutContainer, yateResponse);
+                    yateResponse.getTestClassContainer().toTestFile();
+
+                    // Update ChatUniTest's data structure that holds the generated test class content
+                    pc.getPromptInfo().setUnitTest(yateResponse.getTestClassContainer().getCompleteContent());
                 }
 
                 exportSliceRecord(pc.getPromptInfo(), classInfo, num, i); //todo 检测是否顺利生成信息

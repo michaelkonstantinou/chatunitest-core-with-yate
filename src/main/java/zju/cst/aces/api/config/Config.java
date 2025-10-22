@@ -5,6 +5,8 @@ import com.github.javaparser.symbolsolver.resolution.typesolvers.CombinedTypeSol
 import com.github.javaparser.symbolsolver.resolution.typesolvers.JarTypeSolver;
 import com.github.javaparser.symbolsolver.resolution.typesolvers.JavaParserTypeSolver;
 import com.github.javaparser.symbolsolver.resolution.typesolvers.ReflectionTypeSolver;
+import com.mkonst.config.ConfigYate;
+import com.mkonst.services.PromptService;
 import zju.cst.aces.api.PreProcess;
 import zju.cst.aces.api.Project;
 import com.github.javaparser.JavaParser;
@@ -695,10 +697,13 @@ public class Config {
         logger.info(" DependencyDepth >>> " + this.getDependencyDepth());
         logger.info(" SampleSize >>> " + this.getSampleSize());
         logger.info(" PhaseType >>> " + this.phaseType);
-        logger.info("\n===================================================================\n");
         try {
+            ConfigYate.initialize("/Users/michael.konstantinou/Projects/chatunitest-maven-plugin-with-yate/.env.chatunitest");
+            PromptService.initialize();
+            logger.info(" YATE >>> Initialized");
+            logger.info("\n===================================================================\n");
             Thread.sleep(1000);
-        } catch (InterruptedException e) {
+        } catch (InterruptedException | IOException e) {
             e.printStackTrace();
         }
     }
