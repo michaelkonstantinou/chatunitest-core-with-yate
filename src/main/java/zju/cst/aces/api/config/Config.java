@@ -103,6 +103,7 @@ public class Config {
     public String phaseType;
     public boolean useSlice;
     public boolean useExtra;
+    public YateConfig yate = new YateConfig();
 
     @Getter
     @Setter
@@ -696,6 +697,9 @@ public class Config {
         logger.info(" SleepTime >>> " + this.getSleepTime());
         logger.info(" DependencyDepth >>> " + this.getDependencyDepth());
         logger.info(" SampleSize >>> " + this.getSampleSize());
+        logger.info(" YATE - Model name >>> " + this.getYate().modelName);
+        logger.info(" YATE - Use oracle fixing >>> " + this.getYate().useOracleFixing);
+        logger.info(" YATE - Output Directory >>> " + this.getYate().outputDirectory);
         logger.info(" PhaseType >>> " + this.phaseType);
         try {
             ConfigYate.initialize("/Users/michael.konstantinou/Projects/chatunitest-maven-plugin-with-yate/.env.chatunitest");

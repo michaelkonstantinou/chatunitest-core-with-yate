@@ -1,5 +1,6 @@
 package zju.cst.aces.runner;
 
+import com.mkonst.types.YateResponse;
 import zju.cst.aces.api.phase.Phase;
 import zju.cst.aces.api.phase.PhaseImpl;
 import zju.cst.aces.api.config.Config;
@@ -8,6 +9,7 @@ import zju.cst.aces.api.impl.obfuscator.Obfuscator;
 import zju.cst.aces.dto.*;
 import zju.cst.aces.runner.ClassRunner;
 import zju.cst.aces.util.JsonResponseProcessor;
+import zju.cst.aces.util.yate.YateFixer;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -78,23 +80,16 @@ public class MethodRunner extends ClassRunner {
             return true;
         }
 
-        // Validation and Repair Phase
-        for (int rounds = 1; rounds < config.getMaxRounds(); rounds++) {
+        // Validation and Repair Phase (replaced) using YATE
+        System.out.println("Trying to fix test using YATE: " + promptInfo.fullTestName);
 
-            promptInfo.setRound(rounds);
+        YateFixer yateFixer = new YateFixer(config);
+        YateResponse yateResponse = yateFixer.fixGeneratedTest(fullClassName, classInfo, promptInfo);
 
-            // Repair
-            phase.repairTest(pc);
-
-            // Validation and process
-            if (phase.validateTest(pc)) { // if passed validation
-                exportRecord(pc.getPromptInfo(), classInfo, num);
-                return true;
-            }
-
-        }
+        // Update ChatUniTest's data structure that holds the generated test class content
+        pc.getPromptInfo().setUnitTest(yateResponse.getTestClassContainer().getCompleteContent());
 
         exportRecord(pc.getPromptInfo(), classInfo, num);
-        return false;
+        return !yateResponse.getHasChanges();
     }
 }
